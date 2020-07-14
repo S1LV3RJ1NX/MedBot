@@ -1,0 +1,35 @@
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+intents:
+- affirm
+- deny
+- goodbye
+- medicine_name
+- medicine_time
+- EXTERNAL_reminder:
+    triggers: utter_tell_medicine
+entities:
+- medicine_name
+- time
+slots:
+  medicine_name:
+    type: text
+  time:
+    type: text
+responses:
+  utter_bye:
+  - text: Bye.
+  utter_ask_medicine_name:
+  - text: Please enter your medicine name?
+  utter_ask_medicine_time:
+  - text: Please enter your medicine time?
+  utter_tell_medicine:
+  - text: Hey it's your time to take {medicine_name}
+actions:
+- action_set_reminder
+- action_react_to_reminder
+- utter_bye
+- utter_ask_medicine_name
+- utter_ask_medicine_time
+- utter_tell_medicine
