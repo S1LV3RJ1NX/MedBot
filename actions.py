@@ -13,7 +13,7 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormAction
 from rasa_sdk.events import SlotSet, ReminderScheduled
-from datetime import datetime
+import datetime
 
 # class ActionHelloWorld(Action):
 #
@@ -48,24 +48,31 @@ class ActionSetReminder(Action):
 			]
 		}
 
-	async def run(self, dispatcher: CollectingDispatcher,
-			tracker: Tracker,
-			domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+	async def run(
+		self, 
+		dispatcher: CollectingDispatcher,
+		tracker: Tracker,
+		domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 		# try:	
 			medicine = tracker.get_slot("medicine_name")
 			full_time = tracker.get_slot("time")[:23]
 			print(full_time)
+
 			time = full_time[11:19].split(":")
 			hour,minute = time[0],time[1]
 			resp = "Your reminder for medicine "+str(medicine)+" is set for "+str(hour)+" hr and "+str(minute)+" min daily."
 			print(resp)
+
 			dispatcher.utter_message(text=resp)
-			date = datetime.strptime(full_time,"%Y-%m-%dT%H:%M:%S.%f")
+
+			date = datetime.datetime.strptime(full_time,"%Y-%m-%dT%H:%M:%S.%f")
 			print("Time is: ",date)
+			# date = datetime.datetime.now() + datetime.timedelta(seconds=5)
+
 			reminder = ReminderScheduled(
 				"EXTERNAL_reminder",
 				trigger_date_time=date,
-				name="my_reminder",
+				name="None",
 				kill_on_user_message=False,
 			)
 			return [reminder]

@@ -20,6 +20,10 @@
 * medicine_time
   - action_set_reminder
 
+## Story react_reminder
+* EXTERNAL_reminder
+  - action_react_to_reminder
+
 ## Story deny
 * deny
   - utter_bye

@@ -7,8 +7,7 @@ intents:
 - goodbye
 - medicine_name
 - medicine_time
-- EXTERNAL_reminder:
-    triggers: utter_tell_medicine
+- EXTERNAL_reminder
 entities:
 - medicine_name
 - time
