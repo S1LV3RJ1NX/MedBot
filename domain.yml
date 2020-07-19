@@ -7,17 +7,23 @@ intents:
 - deny
 - cancel_reminder
 - goodbye
-- medicine_name
-- medicine_time
+- tell_medicine_name
+- tell_medicine_time
 - EXTERNAL_reminder
+- chitchat
+- stop
+- request_medicine_reminder
 entities:
 - medicine_name
 - time
+- medicine
 slots:
   medicine_name:
-    type: list
+    type: unfeaturized
+    auto_fill: false
   time:
-    type: list
+    type: unfeaturized
+    auto_fill: false
 responses:
   utter_greet:
   - text: Hii I am medibot. I remind you of your daily medicine times, so that you
@@ -26,13 +32,20 @@ responses:
   - text: Bye.
   utter_ask_medicine_name:
   - text: Please enter your medicine name?
-  utter_ask_medicine_time:
+  utter_ask_time:
   - text: Please enter your medicine time?
+  utter_chitchat:
+  - text: Let's fill the required medicine information. No chitchat  :)
+  utter_ask_continue:
+  - text: Do you wish to continue?
 actions:
-- action_set_reminder
 - action_react_to_reminder
 - action_cancel_reminder
 - utter_greet
 - utter_bye
 - utter_ask_medicine_name
-- utter_ask_medicine_time
+- utter_ask_time
+- utter_chitchat
+- utter_ask_continue
+forms:
+- medicine_form

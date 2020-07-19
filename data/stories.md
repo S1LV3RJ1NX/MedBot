@@ -2,35 +2,66 @@
 * greet
   - utter_greet
 * affirm
-  - utter_ask_medicine_name
-* medicine_name
-  - utter_ask_medicine_time
-* medicine_time
-  - action_set_reminder
+  - medicine_form
+  - form{"name" : "medicine_form"}
+  - form{"name" : null}
 * goodbye
   - utter_bye 
 
+## Story simple 2
+* request_medicine_reminder
+  - medicine_form
+  - form{"name": "medicine_form"}
+  - form{"name" : null}
+
+## Story simple 3
+* request_medicine_reminder{"medicine_name":"clipa"}
+  - medicine_form
+  - form{"name": "medicine_form"}
+  - form{"name" : null}
+
+## Story simple 4
+* request_medicine_reminder{"time":"2020-07-19T17:00:00.000+00:00","medicine_name":"clipa"}
+  - medicine_form
+  - form{"name": "medicine_form"}
+  - form{"name" : null}
+
 ## Story affirm
 * affirm
-  - utter_ask_medicine_name
-* medicine_name
-  - utter_ask_medicine_time
-* medicine_time
-  - action_set_reminder
+  - medicine_form
+  - form{"name" : "medicine_form"}
+  - form{"name" : null}
 * goodbye
   - utter_bye
 
-## Story affirm 2
-* medicine_time
-  - utter_ask_medicine_name
-* medicine_name
-  - action_set_reminder
+## chitchat
+* request_medicine_reminder
+    - medicine_form
+    - form{"name": "medicine_form"}
+* chitchat
+    - utter_chitchat
+    - medicine_form
+    - form{"name": null}
 
-## Story affirm 3
-* medicine_name
-  - utter_ask_medicine_time
-* medicine_time
-  - action_set_reminder
+## chitchat 2
+* request_medicine_reminder
+    - medicine_form
+    - form{"name": "medicine_form"}
+* stop
+    - utter_ask_continue
+* deny
+    - action_deactivate_form
+    - form{"name": null}
+
+## chitchat 3
+* request_medicine_reminder
+    - medicine_form
+    - form{"name": "medicine_form"}
+* stop
+    - utter_ask_continue
+* affirm
+    - medicine_form
+    - form{"name": null}
 
 ## Story react_reminder
 * EXTERNAL_reminder
@@ -43,5 +74,8 @@
 ## Story deny
 * deny
   - utter_bye
+
+
+
 
 

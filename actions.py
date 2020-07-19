@@ -17,21 +17,21 @@ import datetime
 # from dateutil import parser
 
 
-def get_medicine_and_time(tracker):
-	"""This function gets the medicine and tracker name for corresponding reminder
-	It extracts it from the latest event"""
+# def get_medicine_and_time(tracker):
+# 	"""This function gets the medicine and tracker name for corresponding reminder
+# 	It extracts it from the latest event"""
 
-	# print(tracker.events[-1])
-	last_event = tracker.events[-1]
-	medicine = last_event['parse_data']['entities'][0]['value']
-	time = last_event['parse_data']['entities'][1]['value']
-	return medicine,time
+# 	# print(tracker.events[-1])
+# 	last_event = tracker.events[-1]
+# 	medicine = last_event['parse_data']['entities'][0]['value']
+# 	time = last_event['parse_data']['entities'][1]['value']
+# 	return medicine,time
 
 
-class ActionSetReminder(Action):
-	""" This class sets the reminder"""
+class MedicineForm(FormAction):
+	""" This class gets the required form entries and sets the reminder"""
 	def name(self) -> Text:
-		return "action_set_reminder"
+		return "medicine_form"
 
 	@staticmethod
 	def required_slots(tracker: Tracker) -> List[Text]:
@@ -41,27 +41,27 @@ class ActionSetReminder(Action):
 	def slot_mappings(self):
 		return {
 			"medicine_name": [
-				self.from_entity(intent="medicine_name"),
+				self.from_entity(intent="tell_medicine_name",entity="medicine_name"),
 			],
 			"time" : [
-				self.from_entity(intent="time"),
+				self.from_entity(intent="tell_medicine_time",entity="time"),
 			]
 		}
 
-	async def run(
+	async def submit(
 		self, 
 		dispatcher: CollectingDispatcher,
 		tracker: Tracker,
 		domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-		try:
+		# try:
 			# get medicine and tracker name from corresponding slots
 			medicine = tracker.get_slot("medicine_name")
 			full_time = tracker.get_slot("time")[:19]
 			# print(full_time, type(full_time))
 			resp = "Medbot will remind you daily for your medicine!!"
 			# print(resp)
-			dispatcher.utter_message(text=resp)
-
+			
+			print(medicine, full_time)
 			# strip the time in required format
 			date_time = datetime.datetime.strptime(full_time,"%Y-%m-%dT%H:%M:%S")
 
@@ -75,11 +75,12 @@ class ActionSetReminder(Action):
 				entities = {"medicine":medicine,"time":date_time},
 				kill_on_user_message=False,
 			)
+			dispatcher.utter_message(text=resp)
 			return [reminder]
-		except:
-			dispatcher.utter_message(text="Some error unable to set reminder..")
+		# except:
+		# 	dispatcher.utter_message(text="Some error unable to set reminder..")
 
-			return []
+		# 	return []
 
 class ActionReactToReminder(Action):
 	"""Reminds the user to take the medicine."""
