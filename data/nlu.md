@@ -60,6 +60,7 @@
 - [crocine](medicine_name) is medicine
 - [paracetamol](medicine_name)
 - [combiflam](medicine_name)
+- xyz
 
 ## intent:tell_medicine_time
 - daily at 5 pm
@@ -87,6 +88,7 @@
 - revert my reminders.
 - delete all reminders.
 - destory the reminders.
+- cancell all
 
 ## intent:goodbye
 - thanks
@@ -145,6 +147,7 @@
 - listen I want you to remind me to take [cold act](medicine_name) tomorrow at 8am.
 - Set a reminder for [sinerest](medicine_name).
 - set reminder for [crocine](medicine_name) on 1:32pm
+- hjdkgfkdsfgsdgf
 
 ## intent:stop
 - ok then you cant help me

@@ -26,14 +26,6 @@
   - form{"name": "medicine_form"}
   - form{"name" : null}
 
-## Story affirm
-* affirm
-  - medicine_form
-  - form{"name" : "medicine_form"}
-  - form{"name" : null}
-* goodbye
-  - utter_bye
-
 ## chitchat
 * request_medicine_reminder
     - medicine_form
@@ -42,6 +34,7 @@
     - utter_chitchat
     - medicine_form
     - form{"name": null}
+    - utter_bye
 
 ## chitchat 2
 * request_medicine_reminder
@@ -52,6 +45,7 @@
 * deny
     - action_deactivate_form
     - form{"name": null}
+    - utter_bye
 
 ## chitchat 3
 * request_medicine_reminder

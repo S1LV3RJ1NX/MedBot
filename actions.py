@@ -13,19 +13,20 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormAction
 from rasa_sdk.events import SlotSet, ReminderScheduled, AllSlotsReset, ReminderCancelled
+from rasa.core.constants import REQUESTED_SLOT
 import datetime
 # from dateutil import parser
 
 
-# def get_medicine_and_time(tracker):
-# 	"""This function gets the medicine and tracker name for corresponding reminder
-# 	It extracts it from the latest event"""
+def get_medicine_and_time(tracker):
+	"""This function gets the medicine and tracker name for corresponding reminder
+	It extracts it from the latest event"""
 
-# 	# print(tracker.events[-1])
-# 	last_event = tracker.events[-1]
-# 	medicine = last_event['parse_data']['entities'][0]['value']
-# 	time = last_event['parse_data']['entities'][1]['value']
-# 	return medicine,time
+	# print(tracker.events[-1])
+	last_event = tracker.events[-1]
+	medicine = last_event['parse_data']['entities'][0]['value']
+	time = last_event['parse_data']['entities'][1]['value']
+	return medicine,time
 
 
 class MedicineForm(FormAction):
@@ -39,14 +40,36 @@ class MedicineForm(FormAction):
 		return ["medicine_name", "time"]
 
 	def slot_mappings(self):
-		return {
+		return  {
 			"medicine_name": [
-				self.from_entity(intent="tell_medicine_name",entity="medicine_name"),
+				self.from_entity(entity="medicine_name", intent=["tell_medicine_name","request_medicine_reminder"]),
+				self.from_text(not_intent="greet"),
+				self.from_text(not_intent="goodbye"),
+				self.from_text(not_intent="chitchat"),
+				self.from_text(not_intent="affirm"),
+				self.from_text(not_intent="deny"),
+				self.from_text(not_intent="stop")
 			],
 			"time" : [
-				self.from_entity(intent="tell_medicine_time",entity="time"),
+				self.from_entity(entity="time", intent=["tell_medicine_time","request_medicine_reminder"])#not_intent=["greet","goodbye","chitchat","affirm","deny","stop"]),
 			]
 		}
+			
+
+	def validate_medicine_name(
+		self,
+		value: Text,
+		dispatcher: CollectingDispatcher,
+		tracker: Tracker,
+		domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+		value = value.strip()
+		print("value: ",value)
+		if value == None or value == '':
+			# dispatcher.utter_message(template='utter_wrong_medicine')
+			return {"medicine_name":None}
+		else:
+			return {"medicine_name":value}
 
 	async def submit(
 		self, 
@@ -76,7 +99,7 @@ class MedicineForm(FormAction):
 				kill_on_user_message=False,
 			)
 			dispatcher.utter_message(text=resp)
-			return [reminder]
+			return [reminder, AllSlotsReset()]
 		# except:
 		# 	dispatcher.utter_message(text="Some error unable to set reminder..")
 
@@ -111,21 +134,21 @@ class ActionReactToReminder(Action):
 				kill_on_user_message=False,
 			)
 		
-		return [reminder]
+		return [reminder, AllSlotsReset()]
 
 class ForgetReminders(Action):
-    """Cancels all reminders."""
+	"""Cancels all reminders."""
 
-    def name(self) -> Text:
-        return "action_cancel_reminder"
+	def name(self) -> Text:
+		return "action_cancel_reminder"
 
-    async def run(
-        self, dispatcher, tracker: Tracker, domain: Dict[Text, Any]
-    ) -> List[Dict[Text, Any]]:
+	async def run(
+		self, dispatcher, tracker: Tracker, domain: Dict[Text, Any]
+	) -> List[Dict[Text, Any]]:
 
-        dispatcher.utter_message(f"Okay, all your reminders are cancelled !!")
+		dispatcher.utter_message(f"Okay, all your reminders are cancelled !!")
 
-        # Cancel all reminders
-        return [ReminderCancelled(), AllSlotsReset()]
+		# Cancel all reminders
+		return [ReminderCancelled(), AllSlotsReset()]
 
 
