@@ -34,6 +34,7 @@
 - sure
 - You got that right mate.
 - yip
+- yup
 - you're right
 
 ## intent:deny
@@ -74,8 +75,24 @@
 - 12:23
 - 12:20 pm
 - 11:19pm sharp
-- 11:07pm sharp
-- 10:54pm sharp
+
+##intent: tell_interval
+- set the interval of 43 seconds
+- keep reminding after every 5 min 
+- 12 minutes
+- 2 hours
+- 15 sec 
+- 20seconds
+- 5hr
+- 3 min 
+- 10min
+- 1 hr time gap
+- set the frequency to 10 min 
+- let the time gap be 2 hrs 
+- set the dealy between reminders to be 5 min.
+- repeat every 15 sec.
+- once the reminder is set, reccur after 2 hrs.
+
 
 ## intent:cancel_reminder
 - forget about it
@@ -147,7 +164,10 @@
 - listen I want you to remind me to take [cold act](medicine_name) tomorrow at 8am.
 - Set a reminder for [sinerest](medicine_name).
 - set reminder for [crocine](medicine_name) on 1:32pm
-- hjdkgfkdsfgsdgf
+- set reminder for [sinerest](medicine_name) on 3pm with interval of 5 minutes
+- hey can you set reminder for [crocine](medicine_name) at 1:08pm thereby repeating every 1hr?
+- please set reminder at 2am daily for [clipa](medicine_name) with frequency of 51 sec.
+- I want you to remember that I want to take [mast cc](medicine_name) from tomorrow 10pm daily with time gap of 3hrs.
 
 ## intent:stop
 - ok then you cant help me

@@ -9,6 +9,7 @@ intents:
 - goodbye
 - tell_medicine_name
 - tell_medicine_time
+- tell_interval
 - EXTERNAL_reminder
 - chitchat
 - stop
@@ -16,8 +17,11 @@ intents:
 entities:
 - medicine_name
 - time
-- medicine
+- duration
 slots:
+  interval:
+    type: unfeaturized
+    auto_fill: false
   medicine_name:
     type: unfeaturized
     auto_fill: false
@@ -34,6 +38,8 @@ responses:
   - text: Please enter your medicine name?
   utter_ask_time:
   - text: Please enter your medicine time?
+  utter_ask_interval:
+  - text: Please tell your reminder intervals?
   utter_chitchat:
   - text: Let's fill the required medicine information. No chitchat  :)
   utter_ask_continue:
@@ -45,6 +51,7 @@ actions:
 - utter_bye
 - utter_ask_medicine_name
 - utter_ask_time
+- utter_ask_interval
 - utter_chitchat
 - utter_ask_continue
 forms:

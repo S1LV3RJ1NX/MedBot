@@ -26,6 +26,25 @@
   - form{"name": "medicine_form"}
   - form{"name" : null}
 
+## Story simple 5
+* request_medicine_reminder
+  - medicine_form
+  - form{"name": "medicine_form"}
+* greet
+  - utter_greet
+* affirm
+  - medicine_form
+  - form{"name" : null}
+
+## Story simple 6
+* request_medicine_reminder
+  - medicine_form
+  - form{"name": "medicine_form"}
+* deny
+  - action_deactivate_form
+  - form{"name": null}
+  - utter_bye
+
 ## chitchat
 * request_medicine_reminder
     - medicine_form

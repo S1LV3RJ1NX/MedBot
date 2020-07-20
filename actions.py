@@ -13,10 +13,7 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormAction
 from rasa_sdk.events import SlotSet, ReminderScheduled, AllSlotsReset, ReminderCancelled
-from rasa.core.constants import REQUESTED_SLOT
 import datetime
-# from dateutil import parser
-
 
 def get_medicine_and_time(tracker):
 	"""This function gets the medicine and tracker name for corresponding reminder
@@ -26,7 +23,8 @@ def get_medicine_and_time(tracker):
 	last_event = tracker.events[-1]
 	medicine = last_event['parse_data']['entities'][0]['value']
 	time = last_event['parse_data']['entities'][1]['value']
-	return medicine,time
+	interval = last_event['parse_data']['entities'][2]['value']
+	return medicine,time,interval
 
 
 class MedicineForm(FormAction):
@@ -37,24 +35,36 @@ class MedicineForm(FormAction):
 	@staticmethod
 	def required_slots(tracker: Tracker) -> List[Text]:
 		"""A list of required slots the form has to fill"""
-		return ["medicine_name", "time"]
+		return ["medicine_name", "time", "interval"]
 
 	def slot_mappings(self):
 		return  {
 			"medicine_name": [
 				self.from_entity(entity="medicine_name", intent=["tell_medicine_name","request_medicine_reminder"]),
-				self.from_text(not_intent="greet"),
-				self.from_text(not_intent="goodbye"),
-				self.from_text(not_intent="chitchat"),
-				self.from_text(not_intent="affirm"),
-				self.from_text(not_intent="deny"),
-				self.from_text(not_intent="stop")
+				self.from_entity(entity="medicine_name",not_intent=["greet","goodbye","chitchat","affirm","deny","stop"])
+				# self.from_text(not_intent=["greet","goodbye","chitchat","affirm","deny","stop"]),
 			],
 			"time" : [
-				self.from_entity(entity="time", intent=["tell_medicine_time","request_medicine_reminder"])#not_intent=["greet","goodbye","chitchat","affirm","deny","stop"]),
+				self.from_entity(entity="time", intent=["tell_medicine_time","request_medicine_reminder"])
+			],
+			"interval" : [
+				self.from_entity(entity="duration", intent=["tell_interval", "request_medicine_reminder"])
 			]
 		}
 			
+	def validate_interval(
+		self,
+		value: Text,
+		dispatcher: CollectingDispatcher,
+		tracker: Tracker,
+		domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+		seconds = None
+		enitites_from_sentence = tracker.latest_message['entities']
+		for entities in enitites_from_sentence:
+			if entities['entity'] == 'duration':
+				seconds = entities['additional_info']['normalized']['value']
+		return {"interval":seconds}
 
 	def validate_medicine_name(
 		self,
@@ -64,7 +74,7 @@ class MedicineForm(FormAction):
 		domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
 		value = value.strip()
-		print("value: ",value)
+		# print("value: ",value)
 		if value == None or value == '':
 			# dispatcher.utter_message(template='utter_wrong_medicine')
 			return {"medicine_name":None}
@@ -77,25 +87,23 @@ class MedicineForm(FormAction):
 		tracker: Tracker,
 		domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 		# try:
-			# get medicine and tracker name from corresponding slots
+			# get medicine, reminder time and interval from corresponding slots
 			medicine = tracker.get_slot("medicine_name")
 			full_time = tracker.get_slot("time")[:19]
-			# print(full_time, type(full_time))
+			interval = tracker.get_slot("interval")
+
 			resp = "Medbot will remind you daily for your medicine!!"
-			# print(resp)
 			
-			print(medicine, full_time)
 			# strip the time in required format
 			date_time = datetime.datetime.strptime(full_time,"%Y-%m-%dT%H:%M:%S")
 
-			# print("Time is: ",date_time)
-			# date_time = datetime.datetime.now() + datetime.timedelta(seconds=18)
-			
+			print(medicine,full_time,interval)
+
 			# Schedule the reminder
 			reminder = ReminderScheduled(
 				"EXTERNAL_reminder",
 				trigger_date_time=date_time,
-				entities = {"medicine":medicine,"time":date_time},
+				entities = {"medicine":medicine,"time":date_time,"interval":interval},
 				kill_on_user_message=False,
 			)
 			dispatcher.utter_message(text=resp)
@@ -119,18 +127,19 @@ class ActionReactToReminder(Action):
 	) -> List[Dict[Text, Any]]:
 
 		# get medicine and requied time
-		medicine,d_time = get_medicine_and_time(tracker)
+		medicine,d_time,interval = get_medicine_and_time(tracker)
 		# print(medicine, d_time)
 		resp = "Hii it's your time to take medicine: "+str(medicine)
 		# print(resp)
 		dispatcher.utter_message(text=resp)
 
-		# for easy check right now timing set to 43 seconds.
-		new_time = datetime.datetime.utcfromtimestamp(d_time) + datetime.timedelta(seconds=43)
+
+		new_time = datetime.datetime.utcfromtimestamp(d_time) + datetime.timedelta(seconds=interval)
+		
 		reminder = ReminderScheduled(
 				"EXTERNAL_reminder",
 				trigger_date_time=new_time,
-				entities = {"medicine":medicine,"time":new_time},
+				entities = {"medicine":medicine,"time":new_time,"interval":interval},
 				kill_on_user_message=False,
 			)
 		
