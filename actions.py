@@ -41,11 +41,11 @@ class MedicineForm(FormAction):
 		return  {
 			"medicine_name": [
 				self.from_entity(entity="medicine_name", intent=["tell_medicine_name","request_medicine_reminder"]),
-				self.from_entity(entity="medicine_name",not_intent=["greet","goodbye","chitchat","affirm","deny","stop"])
+				self.from_text(not_intent=["goodbye","deny","stop"])
 				# self.from_text(not_intent=["greet","goodbye","chitchat","affirm","deny","stop"]),
 			],
 			"time" : [
-				self.from_entity(entity="time", intent=["tell_medicine_time","request_medicine_reminder"])
+				self.from_entity(entity="time", intent=["tell_medicine_name", "tell_medicine_time","request_medicine_reminder"])
 			],
 			"interval" : [
 				self.from_entity(entity="duration", intent=["tell_interval", "request_medicine_reminder"])
@@ -86,7 +86,7 @@ class MedicineForm(FormAction):
 		dispatcher: CollectingDispatcher,
 		tracker: Tracker,
 		domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-		# try:
+		try:
 			# get medicine, reminder time and interval from corresponding slots
 			medicine = tracker.get_slot("medicine_name")
 			full_time = tracker.get_slot("time")[:19]
@@ -96,22 +96,22 @@ class MedicineForm(FormAction):
 			
 			# strip the time in required format
 			date_time = datetime.datetime.strptime(full_time,"%Y-%m-%dT%H:%M:%S")
-
+			# datetime = str(date_time)
 			print(medicine,full_time,interval)
 
 			# Schedule the reminder
 			reminder = ReminderScheduled(
 				"EXTERNAL_reminder",
 				trigger_date_time=date_time,
-				entities = {"medicine":medicine,"time":date_time,"interval":interval},
+				entities = {"medicine":medicine,"time":str(date_time),"interval":interval},
 				kill_on_user_message=False,
 			)
 			dispatcher.utter_message(text=resp)
 			return [reminder, AllSlotsReset()]
-		# except:
-		# 	dispatcher.utter_message(text="Some error unable to set reminder..")
+		except:
+			dispatcher.utter_message(text="Some error unable to set reminder..")
 
-		# 	return []
+			return []
 
 class ActionReactToReminder(Action):
 	"""Reminds the user to take the medicine."""
@@ -133,13 +133,14 @@ class ActionReactToReminder(Action):
 		# print(resp)
 		dispatcher.utter_message(text=resp)
 
-
-		new_time = datetime.datetime.utcfromtimestamp(d_time) + datetime.timedelta(seconds=interval)
-		
+		d_time = datetime.datetime.strptime(d_time,"%Y-%m-%d %H:%M:%S")
+		# new_time = datetime.datetime.utcfromtimestamp(d_time) + datetime.timedelta(seconds=interval)
+		new_time = d_time + datetime.timedelta(seconds=interval)
+		print(new_time)
 		reminder = ReminderScheduled(
 				"EXTERNAL_reminder",
 				trigger_date_time=new_time,
-				entities = {"medicine":medicine,"time":new_time,"interval":interval},
+				entities = {"medicine":medicine,"time":str(new_time),"interval":interval},
 				kill_on_user_message=False,
 			)
 		
